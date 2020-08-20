@@ -708,6 +708,7 @@ static void wifi_dns_found_callback(const char *name, const ip_addr_t *ipaddr, v
  */
 int WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult)
 {
+    Serial.println("My code");
     ip_addr_t addr;
     aResult = static_cast<uint32_t>(0);
     waitStatusBits(WIFI_DNS_IDLE_BIT, 16000);
