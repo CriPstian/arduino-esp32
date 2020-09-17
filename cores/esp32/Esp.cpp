@@ -232,6 +232,11 @@ uint32_t EspClass::getFlashChipSize(void)
     return magicFlashChipSize(fhdr.spi_size);
 }
 
+uint32_t EspClass::getFlashChipRealSize(void)
+{
+    return (uint32_t)spi_flash_get_chip_size();
+}
+
 uint32_t EspClass::getFlashChipSpeed(void)
 {
     esp_image_header_t fhdr;

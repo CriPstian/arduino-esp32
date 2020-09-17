@@ -81,6 +81,7 @@ public:
 
     void deepSleep(uint32_t time_us);
 
+    uint32_t getFlashChipRealSize();
     uint32_t getFlashChipSize();
     uint32_t getFlashChipSpeed();
     FlashMode_t getFlashChipMode();
