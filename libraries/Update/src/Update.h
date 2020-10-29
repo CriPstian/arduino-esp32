@@ -82,6 +82,8 @@ class UpdateClass {
     */
     void printError(Print &out);
 
+    String getMyError() const;
+
     const char * errorString();
 
     /*
@@ -161,6 +163,7 @@ class UpdateClass {
 
   private:
     void _reset();
+    void _abort(uint8_t err, size_t len);
     void _abort(uint8_t err);
     bool _writeBuffer();
     bool _verifyHeader(uint8_t data);
@@ -169,6 +172,7 @@ class UpdateClass {
 
 
     uint8_t _error;
+    String _myError;
     uint8_t *_buffer;
     uint8_t *_skipBuffer;
     size_t _bufferLen;

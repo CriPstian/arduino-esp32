@@ -164,6 +164,17 @@ bool UpdateClass::begin(size_t size, int command, int ledPin, uint8_t ledOn) {
     return true;
 }
 
+void UpdateClass::_abort(uint8_t err, size_t len) {
+    _myError = F("Aborted because: _size = ");
+    _myError += String(_size);
+    _myError += F(" and _progress = ");
+    _myError += String(_progress);
+    _myError += F(" and len = ");
+    _myError += String(len);
+    _reset();
+    _error = err;
+}
+
 void UpdateClass::_abort(uint8_t err){
     _reset();
     _error = err;
@@ -295,7 +306,7 @@ size_t UpdateClass::write(uint8_t *data, size_t len) {
     }
 
     if(len > remaining()){
-        _abort(UPDATE_ERROR_SPACE);
+        _abort(UPDATE_ERROR_SPACE, len);
         return 0;
     }
 
@@ -370,6 +381,10 @@ void UpdateClass::printError(Print &out){
 
 const char * UpdateClass::errorString(){
     return _err2str(_error);
+}
+
+String UpdateClass::getMyError() const {
+    return _myError;
 }
 
 UpdateClass Update;

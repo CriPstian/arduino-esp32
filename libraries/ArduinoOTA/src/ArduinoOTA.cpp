@@ -21,10 +21,10 @@ ArduinoOTAClass::ArduinoOTAClass()
 , _cmd(0)
 , _ota_port(0)
 , _ota_timeout(1000)
-, _start_callback(NULL)
-, _end_callback(NULL)
-, _error_callback(NULL)
-, _progress_callback(NULL)
+, _start_callback(nullptr)
+, _end_callback(nullptr)
+, _error_callback(nullptr)
+, _progress_callback(nullptr)
 {
 }
 
@@ -228,7 +228,9 @@ void ArduinoOTAClass::_onRx(){
             _udp_ota.print("Authentication Failed");
             log_w("Authentication Failed");
             _udp_ota.endPacket();
-            if (_error_callback) _error_callback(OTA_AUTH_ERROR);
+            if (_error_callback) {
+                _error_callback(OTA_AUTH_ERROR, false, false, "no error", "no error");
+            }
             _state = OTA_IDLE;
         }
     }
@@ -240,7 +242,7 @@ void ArduinoOTAClass::_runUpdate() {
         log_e("Begin ERROR: %s", Update.errorString());
 
         if (_error_callback) {
-            _error_callback(OTA_BEGIN_ERROR);
+            _error_callback(OTA_BEGIN_ERROR, false, false, "no error","no error");
         }
         _state = OTA_IDLE;
         return;
@@ -257,14 +259,16 @@ void ArduinoOTAClass::_runUpdate() {
     WiFiClient client;
     if (!client.connect(_ota_ip, _ota_port)) {
         if (_error_callback) {
-            _error_callback(OTA_CONNECT_ERROR);
+            _error_callback(OTA_CONNECT_ERROR, false, false, "no error","no error");
         }
         _state = OTA_IDLE;
     }
 
     uint32_t written = 0, total = 0, tried = 0;
 
-    while (!Update.isFinished() && client.connected()) {
+    bool updateIsFinished;
+    bool clientConnected;
+    while (!(updateIsFinished = Update.isFinished()) && (clientConnected = client.connected())) {
         size_t waited = _ota_timeout;
         size_t available = client.available();
         while (!available && waited){
@@ -284,7 +288,7 @@ void ArduinoOTAClass::_runUpdate() {
             }
             log_e("Receive Failed");
             if (_error_callback) {
-                _error_callback(OTA_RECEIVE_ERROR);
+                _error_callback(OTA_RECEIVE_ERROR, false, false, "no error","no error");
             }
             _state = OTA_IDLE;
             Update.abort();
@@ -336,7 +340,7 @@ void ArduinoOTAClass::_runUpdate() {
         }
     } else {
         if (_error_callback) {
-            _error_callback(OTA_END_ERROR);
+            _error_callback(OTA_END_ERROR, updateIsFinished, clientConnected, Update.errorString(), Update.getMyError());
         }
         Update.printError(client);
         client.stop();
